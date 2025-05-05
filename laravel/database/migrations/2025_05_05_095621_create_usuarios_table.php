@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('usuarios', function (Blueprint $table) {
-            $table->bigIncrements('id_usuario');
+            $table->id('id_usuario'); // clave primaria personalizada
             $table->string('nombre', 100);
-            $table->string('apellidos', 100);
-            $table->string('gmail', 100);
-            $table->string('contraseña', 100);
-            $table->string('telefono', 15);
+            $table->string('apellidos', 150);
+            $table->string('gmail', 150)->unique();
+            $table->string('contraseña', 255);
+            $table->string('telefono', 20)->nullable();
+            $table->timestamps();
         });
+        
     }
 
     /**

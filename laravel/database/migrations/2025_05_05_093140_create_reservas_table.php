@@ -12,18 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reservas', function (Blueprint $table) {
-            $table->id('reserva_id'); // BIGINT AUTO_INCREMENT PRIMARY KEY
-            $table->foreignId('id_usuario')
-            ->constrained('usuarios')
-            ->onDelete('cascade');      
+            $table->id('reserva_id'); // clave primaria personalizada
+            $table->unsignedBigInteger('id_usuario'); // FK hacia usuarios.id_usuario
+            $table->foreign('id_usuario')
+                  ->references('id_usuario')
+                  ->on('usuarios')
+                  ->onDelete('cascade');
+        
             $table->date('fecha_reserva');
             $table->time('hora_reserva');
             $table->integer('numero_personas');
             $table->decimal('subtotal', 10, 2);
-            $table->enum('estado', ['pendiente', 'finalizada', 'cancelada'])
-                  ->default('pendiente');
-            $table->timestamps(); // created_at y updated_at
+            $table->enum('estado', ['pendiente', 'finalizada', 'cancelada'])->default('pendiente');
+            $table->timestamps();
         });
+        
     }
 
     /**
