@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('reservas', function (Blueprint $table) {
-            $table->id(); // BIGINT AUTO_INCREMENT PRIMARY KEY
-            $table->foreignId('id_usuario') // BIGINT FOREIGN KEY → users(id)
-                  ->constrained()
-                  ->onDelete('cascade');
+            $table->id('reserva_id'); // BIGINT AUTO_INCREMENT PRIMARY KEY
+            $table->foreignId('id_usuario')
+            ->constrained('usuarios')
+            ->onDelete('cascade');      
             $table->date('fecha_reserva');
             $table->time('hora_reserva');
             $table->integer('numero_personas');
