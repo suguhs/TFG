@@ -32,7 +32,7 @@ return new class extends Migration
             $table->decimal('precio', 10, 2); // Precio del plato al momento de la reserva
             $table->timestamps(); // created_at y updated_at
         });
-        
+    }
 
     /**
      * Reverse the migrations.
