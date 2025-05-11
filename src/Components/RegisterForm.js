@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function RegisterForm() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ function RegisterForm() {
   });
 
   const [mensaje, setMensaje] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -21,9 +23,10 @@ function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMensaje('');
 
     try {
-      const res = await fetch('http://localhost:8000/api/register', {
+      const res = await fetch('http://127.0.0.1:8000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -34,7 +37,7 @@ function RegisterForm() {
       const data = await res.json();
 
       if (res.ok) {
-        setMensaje('Usuario registrado correctamente.');
+        setMensaje('✅ Usuario registrado correctamente.');
         setFormData({
           nombre: '',
           apellidos: '',
@@ -43,19 +46,27 @@ function RegisterForm() {
           telefono: '',
           rol: 'guest'
         });
+
+        setTimeout(() => {
+          navigate('/login');
+        }, 1000);
+      } else if (res.status === 422 && data.errors) {
+        const errores = Object.values(data.errors).flat().join('\n');
+        setMensaje('❌ ' + errores);
       } else {
-        setMensaje('Error: ' + JSON.stringify(data));
+        setMensaje('❌ Error inesperado del servidor.');
       }
     } catch (error) {
-      setMensaje('Error al conectar con el servidor');
       console.error(error);
+      setMensaje('❌ Error al conectar con el servidor.');
     }
   };
 
   return (
     <div>
       <h2>Registro de Usuario</h2>
-      {mensaje && <p>{mensaje}</p>}
+      {mensaje && <p style={{ color: mensaje.includes('✅') ? 'green' : 'red' }}>{mensaje}</p>}
+
       <form onSubmit={handleSubmit}>
         <input type="text" name="nombre" placeholder="Nombre" value={formData.nombre} onChange={handleChange} required />
         <input type="text" name="apellidos" placeholder="Apellidos" value={formData.apellidos} onChange={handleChange} required />
