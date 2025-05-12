@@ -26,4 +26,9 @@ class Usuario extends Model
     {
         return $this->hasMany(Reserva::class, 'id_usuario', 'id_usuario');
     }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class, 'usuario_id', 'id_usuario');
+    }
 }
