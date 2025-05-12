@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import RegisterForm from './Components/RegisterForm';
 import LoginForm from './Components/LoginForm';
 import Welcome from './Components/Welcome';
+import Comentarios from './Components/Comentarios';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/registro" element={<RegisterForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route path="/" element={<Welcome />} />
+          <Route path="/comentarios" element={<Comentarios />} />
         </Routes>
       </div>
     </Router>
