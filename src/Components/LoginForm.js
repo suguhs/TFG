@@ -37,7 +37,6 @@ function LoginForm() {
     }
   };
 
-  // ✅ función para redirigir a registro
   const irARegistro = () => {
     navigate('/registro');
   };
@@ -69,4 +68,3 @@ function LoginForm() {
 }
 
 export default LoginForm;
-// 🔄 Redirigir a registro
