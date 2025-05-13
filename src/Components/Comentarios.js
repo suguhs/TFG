@@ -9,7 +9,7 @@ const Comentarios = () => {
 
   useEffect(() => {
     // Cargar usuario logueado desde localStorage
-    const user = JSON.parse(localStorage.getItem("usuario"));
+    const user = JSON.parse(localStorage.getItem('usuario'));
     if (user) setUsuario(user);
 
     obtenerComentarios();
@@ -62,19 +62,26 @@ const Comentarios = () => {
     <div className="max-w-xl mx-auto p-4">
       <h2 className="text-xl font-bold mb-4">Comentarios</h2>
 
-      <form onSubmit={enviarComentario} className="mb-6">
-        <textarea
-          value={contenido}
-          onChange={(e) => setContenido(e.target.value)}
-          className="w-full border rounded p-2 mb-2"
-          placeholder="Escribe tu comentario..."
-          rows="3"
-        />
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          Enviar
-        </button>
-      </form>
+      {/* ✅ Solo mostrar el formulario si hay usuario logueado */}
+      {usuario ? (
+        <form onSubmit={enviarComentario} className="mb-6">
+          <textarea
+            value={contenido}
+            onChange={(e) => setContenido(e.target.value)}
+            className="w-full border rounded p-2 mb-2"
+            placeholder="Escribe tu comentario..."
+            rows="3"
+          />
+          {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+            Enviar
+          </button>
+        </form>
+      ) : (
+        <p className="text-center text-gray-500 mb-4">
+          🔒 Debes <a href="/login" className="text-blue-600">iniciar sesión</a> para comentar.
+        </p>
+      )}
 
       <ul>
         {comentarios.map((comentario) => (
@@ -97,6 +104,5 @@ const Comentarios = () => {
       </ul>
     </div>
   );
-};
-
+}
 export default Comentarios;
