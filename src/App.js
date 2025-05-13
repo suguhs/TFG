@@ -4,19 +4,18 @@ import RegisterForm from './Components/RegisterForm';
 import LoginForm from './Components/LoginForm';
 import Welcome from './Components/Welcome';
 import Comentarios from './Components/Comentarios';
+import Navbar from './Components/Navbar';
 
 function App() {
   return (
     <Router>
-      <div>
-        <h1>Mi Aplicación</h1>
-        <Routes>
-          <Route path="/registro" element={<RegisterForm />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/" element={<Welcome />} />
-          <Route path="/comentarios" element={<Comentarios />} />
-        </Routes>
-      </div>
+      <Navbar /> {/* 👈 visible en todas las rutas */}
+      <Routes>
+        <Route path="/" element={<Welcome />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/registro" element={<RegisterForm />} />
+        <Route path="/comentarios" element={<Comentarios />} />
+      </Routes>
     </Router>
   );
 }
