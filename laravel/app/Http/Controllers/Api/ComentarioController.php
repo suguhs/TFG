@@ -10,22 +10,28 @@ use App\Models\Comentario;
 class ComentarioController extends Controller
 {
     public function store(Request $request)
-    {
-        $request->validate([
-            'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'contenido' => 'required|string|max:1000'
-        ]);
+{
+    $request->validate([
+        'usuario_id' => 'required|exists:usuarios,id_usuario',
+        'contenido' => 'required|string|max:1000'
+    ]);
 
-        $comentario = Comentario::create([
-            'usuario_id' => $request->usuario_id,
-            'contenido' => $request->contenido
-        ]);
-
-        return response()->json([
-            'message' => 'Comentario creado',
-            'comentario' => $comentario->load('usuario')
-        ], 201);
+    // Seguridad extra: prevenir creación sin usuario real
+    if (!$request->usuario_id || !\App\Models\Usuario::find($request->usuario_id)) {
+        return response()->json(['message' => 'No autorizado'], 403);
     }
+
+    $comentario = Comentario::create([
+        'usuario_id' => $request->usuario_id,
+        'contenido' => $request->contenido
+    ]);
+
+    return response()->json([
+        'message' => 'Comentario creado',
+        'comentario' => $comentario->load('usuario')
+    ], 201);
+}
+
 
     public function index()
     {
