@@ -14,7 +14,7 @@ class Plato extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'nombre', 'descripcion', 'precio'
+        'nombre_plato', 'descripcion', 'precio','imagen'
         // añade más si tienes
     ];
 
