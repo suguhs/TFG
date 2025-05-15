@@ -73,7 +73,7 @@ const Comentarios = () => {
             rows="3"
           />
           {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+          <button type="submit" className="bg-blue-500 text-black px-4 py-2 rounded">
             Enviar
           </button>
         </form>
