@@ -14,33 +14,48 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary px-4">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">Mi App</Link>
+
         <div className="collapse navbar-collapse show">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <Link className="nav-link" to="/">Inicio</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/comentarios">Comentarios</Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/menu">Menú</Link>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/reserva">Reserva</Link>
+            </li>
           </ul>
 
           <ul className="navbar-nav">
             {usuario ? (
-              <>
-                <li className="nav-item">
-                  <span className="nav-link">Hola, {usuario.nombre}</span>
-                </li>
-                <li className="nav-item">
-                  <button onClick={cerrarSesion} className="btn btn-light btn-sm ms-2">Cerrar sesión</button>
-                </li>
-              </>
+              <li className="nav-item dropdown">
+                <button
+                  className="btn btn-light rounded-circle d-flex align-items-center justify-content-center"
+                  id="perfilDropdown"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  style={{ width: "40px", height: "40px" }}
+                >
+                  <i className="bi bi-person-fill"></i>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="perfilDropdown">
+                  <li><Link className="dropdown-item" to="/historial">Ver historial</Link></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li><button className="dropdown-item" onClick={cerrarSesion}>Cerrar sesión</button></li>
+                </ul>
+              </li>
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">Iniciar sesión</Link>
+                  <Link className="btn btn-outline-light btn-sm me-2" to="/login">Iniciar sesión</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/registro">Registrarse</Link>
+                  <Link className="btn btn-light btn-sm" to="/registro">Registrarse</Link>
                 </li>
               </>
             )}
