@@ -11,7 +11,7 @@ import SeleccionPlatos from './Components/SeleccionPlatos';
 function App() {
   return (
     <Router>
-      <Navbar /> {/* 👈 visible en todas las rutas */}
+      <Navbar /> //si se le ponefuera de los Routes hace que se vea en todas las paginas
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<LoginForm />} />
