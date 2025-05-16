@@ -7,11 +7,16 @@ import Comentarios from './Components/Comentarios';
 import Navbar from './Components/Navbar';
 import ReservaForm from './Components/ReservaForm';
 import SeleccionPlatos from './Components/SeleccionPlatos';
+import Historial from './Components/Historial';
 
+////si se le pone fuera de los Routes hace que se vea en todas las paginas               )}
 function App() {
+  <h1 style={{ color: 'red' }}>Probando App.js</h1>
+
   return (
+    
     <Router>
-      <Navbar /> //si se le ponefuera de los Routes hace que se vea en todas las paginas
+      <Navbar />               
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<LoginForm />} />
@@ -19,6 +24,8 @@ function App() {
         <Route path="/comentarios" element={<Comentarios />} />
         <Route path="/reserva" element={<ReservaForm />} />
         <Route path="/reservas/:id/platos" element={<SeleccionPlatos />} />
+        <Route path="/historial" element={<Historial />} />
+
       </Routes>
     </Router>
   );
