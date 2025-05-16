@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('nombre_plato', 100);
             $table->text('descripcion');
             $table->decimal('precio', 10, 2);
+            $table->string('imagen')->nullable(); // ruta o URL de imagen
+
         });
         
     }
