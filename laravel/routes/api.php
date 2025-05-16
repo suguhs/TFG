@@ -18,6 +18,9 @@ Route::get('/platos', [PlatoController::class, 'index']);
 Route::post('/reservas', [ReservaController::class, 'store']);
 Route::post('/reservas/{id}/platos', [ReservaController::class, 'añadirPlatos']);
 Route::get('/platos', [PlatoController::class, 'index']);
+Route::get('/historial', [ReservaController::class, 'historialUsuario']);
+Route::get('/mesas-disponibles', [ReservaController::class, 'mesasDisponibles']);
+
 
 
 

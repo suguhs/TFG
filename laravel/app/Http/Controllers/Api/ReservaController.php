@@ -71,6 +71,35 @@ public function añadirPlatos(Request $request, $id)
 
     return response()->json(['message' => 'Platos añadidos y subtotal actualizado'], 200);
 }
+    public function historialUsuario(Request $request)
+        {
+             $usuarioId = $request->query('id_usuario'); // ✅ aquí solo usamos query param
+
+             $reservas = Reserva::with(['detalles.plato'])
+                 ->where('id_usuario', $usuarioId)
+                 ->orderByDesc('fecha_reserva')
+                 ->get();
+
+            return response()->json($reservas);
+        }
+    public function mesasDisponibles(Request $request)
+{
+    $fecha = $request->query('fecha');
+    if (!$fecha) {
+        return response()->json(['message' => 'Fecha requerida'], 400);
+    }
+
+    $mesasOcupadas = Reserva::where('fecha_reserva', $fecha)
+        ->get()
+        ->sum(fn($r) => ceil($r->numero_personas / self::PERSONAS_POR_MESA));
+
+    $disponibles = self::MESAS_TOTALES - $mesasOcupadas;
+
+    return response()->json(['mesas_disponibles' => max(0, $disponibles)]);
+}
+
+
+
 
 
 }
