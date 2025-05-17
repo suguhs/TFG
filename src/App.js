@@ -8,10 +8,10 @@ import Navbar from './Components/Navbar';
 import ReservaForm from './Components/ReservaForm';
 import SeleccionPlatos from './Components/SeleccionPlatos';
 import Historial from './Components/Historial';
+import Menu from './Components/Menu';
 
 ////si se le pone fuera de los Routes hace que se vea en todas las paginas               )}
 function App() {
-  <h1 style={{ color: 'red' }}>Probando App.js</h1>
 
   return (
     
@@ -20,6 +20,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Welcome />} />
         <Route path="/login" element={<LoginForm />} />
+        <Route path="/menu" element={<Menu />} />
         <Route path="/registro" element={<RegisterForm />} />
         <Route path="/comentarios" element={<Comentarios />} />
         <Route path="/reserva" element={<ReservaForm />} />
