@@ -24,9 +24,15 @@ function LoginForm() {
 
       if (res.ok) {
         setMensaje('✅ Inicio de sesión exitoso');
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+        // ✅ Guardar usuario + token
+        localStorage.setItem('usuario', JSON.stringify({
+          ...data.usuario,
+          token: data.access_token
+        }));
+
         setTimeout(() => {
-          navigate('/');
+          navigate('/'); // o a donde quieras ir después de iniciar sesión
         }, 1000);
       } else {
         setMensaje('❌ Correo o contraseña incorrectos');
