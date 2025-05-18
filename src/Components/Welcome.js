@@ -7,11 +7,16 @@ function Bienvenida() {
 
   useEffect(() => {
     const usuarioGuardado = localStorage.getItem('usuario');
-    if (usuarioGuardado) {
-      const usuario = JSON.parse(usuarioGuardado);
-      setNombre(usuario.nombre);
+
+    if (!usuarioGuardado) {
+      // Si no hay sesión, redirigir al login
+      navigate('/login');
+      return;
     }
-  }, []);
+
+    const usuario = JSON.parse(usuarioGuardado);
+    setNombre(usuario.nombre);
+  }, [navigate]);
 
   const cerrarSesion = () => {
     localStorage.removeItem('usuario'); // 👈 Borrar sesión

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -34,7 +35,7 @@ const Comentarios = () => {
     try {
       const res = await axios.post('http://127.0.0.1:8000/api/comentarios', {
         usuario_id: usuario.id_usuario,
-        contenido
+        contenido: contenido
       });
       setComentarios([res.data.comentario, ...comentarios]);
       setContenido('');
@@ -49,70 +50,57 @@ const Comentarios = () => {
 
   const eliminarComentario = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/comentarios/${id}`);
+      await axios.delete(`http://127.0.0.1:8000/api/comentarios/${id}`, {
+        headers: {
+          Authorization: `Bearer ${usuario.token}` // si usas Sanctum o Passport
+        }
+      });
       setComentarios(comentarios.filter(c => c.id !== id));
     } catch (err) {
-      console.error('Error al eliminar comentario:', err);
+      alert('❌ No tienes permiso para eliminar este comentario.');
     }
   };
 
   return (
-    <div className="container py-5">
-      <h2 className="text-center mb-4">
-        <i className="bi bi-chat-left-text"></i> Comentarios
-      </h2>
+    <div className="container mt-4">
+      <h2 className="mb-4">💬 Comentarios ({comentarios.length})</h2>
 
-      {/* Formulario */}
-      <form onSubmit={enviarComentario} className="mb-4">
-        {usuario ? (
-          <>
-            <div className="mb-3">
-              <textarea
-                className="form-control"
-                rows="3"
-                value={contenido}
-                onChange={(e) => setContenido(e.target.value)}
-                placeholder="Escribe tu comentario..."
-              ></textarea>
-            </div>
-            <div className="d-flex justify-content-end">
-              <button type="submit" className="btn btn-primary">
-                Enviar
-              </button>
-            </div>
-            {error && <div className="text-danger mt-2">{error}</div>}
-          </>
-        ) : (
-          <p className="text-center text-muted">
-            🔒 <a href="/login">Inicia sesión</a> para comentar.
-          </p>
-        )}
-      </form>
-
-      {/* Lista de comentarios */}
-      <div className="d-flex flex-column gap-3">
-        {comentarios.map((comentario) => (
-          <div key={comentario.id} className="card">
-            <div className="card-body d-flex justify-content-between align-items-start">
-              <div>
-                <h6 className="card-subtitle mb-2 text-muted">{comentario.usuario?.nombre}:</h6>
-                <p className="card-text mb-1">{comentario.contenido}</p>
-                <small className="text-muted">
-                  {new Date(comentario.created_at).toLocaleString()}
-                </small>
-              </div>
-              {usuario && comentario.usuario_id === usuario.id_usuario && (
-                <button
-                  onClick={() => eliminarComentario(comentario.id)}
-                  className="btn btn-link text-danger btn-sm ms-3"
-                >
-                  Eliminar
-                </button>
-              )}
-            </div>
+      {usuario ? (
+        <form onSubmit={enviarComentario} className="mb-4">
+          <div className="mb-3">
+            <textarea
+              value={contenido}
+              onChange={(e) => setContenido(e.target.value)}
+              className="form-control"
+              rows="3"
+              placeholder="Escribe tu comentario..."
+            />
           </div>
+          {error && <p className="text-danger">{error}</p>}
+          <button type="submit" className="btn btn-primary">Enviar</button>
+        </form>
+      ) : (
+        <p className="text-muted text-center mb-4">
+          🔒 Debes <a href="/login">iniciar sesión</a> para comentar.
+        </p>
+      )}
+
+      <ul className="list-group">
+        {comentarios.map((comentario) => (
+          <li key={comentario.id} className="list-group-item d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{comentario.usuario?.nombre || 'Usuario'}:</strong>
+              <p className="mb-1">{comentario.contenido}</p>
+              <small className="text-muted">{new Date(comentario.created_at).toLocaleString()}</small>
+            </div>
+            {(usuario && (comentario.usuario_id === usuario.id_usuario || usuario.rol === 'admin')) && (
+              <button className="btn btn-sm btn-danger" onClick={() => eliminarComentario(comentario.id)}>
+                Eliminar
+              </button>
+            )}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
