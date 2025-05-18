@@ -97,6 +97,28 @@ public function añadirPlatos(Request $request, $id)
 
     return response()->json(['mesas_disponibles' => max(0, $disponibles)]);
 }
+public function historialTodas()
+{
+    $reservas = Reserva::with(['detalles.plato', 'usuario'])
+        ->orderByDesc('fecha_reserva')
+        ->get();
+
+    return response()->json($reservas);
+}
+public function cambiarEstado(Request $request, $id)
+{
+    $request->validate([
+        'estado' => 'required|in:pendiente,aceptada,rechazada,finalizada,cancelada'
+    ]);
+
+    $reserva = Reserva::findOrFail($id);
+    $reserva->estado = $request->estado;
+    $reserva->save();
+
+    return response()->json(['message' => 'Estado actualizado'], 200);
+}
+
+
 
 
 
