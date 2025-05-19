@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosCliente from './AxiosCliente';
 
 const Comentarios = () => {
   const [comentarios, setComentarios] = useState([]);
@@ -16,7 +15,7 @@ const Comentarios = () => {
 
   const obtenerComentarios = async () => {
     try {
-      const res = await axios.get('http://127.0.0.1:8000/api/comentarios');
+      const res = await axiosCliente.get('/comentarios');
       setComentarios(res.data);
     } catch (err) {
       console.error('Error al cargar comentarios:', err);
@@ -33,10 +32,11 @@ const Comentarios = () => {
     }
 
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/comentarios', {
+      const res = await axiosCliente.post('/comentarios', {
         usuario_id: usuario.id_usuario,
         contenido: contenido
       });
+
       setComentarios([res.data.comentario, ...comentarios]);
       setContenido('');
     } catch (err) {
@@ -50,11 +50,7 @@ const Comentarios = () => {
 
   const eliminarComentario = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/comentarios/${id}`, {
-        headers: {
-          Authorization: `Bearer ${usuario.token}` // si usas Sanctum o Passport
-        }
-      });
+      await axiosCliente.delete(`/comentarios/${id}`);
       setComentarios(comentarios.filter(c => c.id !== id));
     } catch (err) {
       alert('❌ No tienes permiso para eliminar este comentario.');
@@ -86,21 +82,33 @@ const Comentarios = () => {
       )}
 
       <ul className="list-group">
-        {comentarios.map((comentario) => (
-          <li key={comentario.id} className="list-group-item d-flex justify-content-between align-items-start">
-            <div>
-              <strong>{comentario.usuario?.nombre || 'Usuario'}:</strong>
-              <p className="mb-1">{comentario.contenido}</p>
-              <small className="text-muted">{new Date(comentario.created_at).toLocaleString()}</small>
-            </div>
-            {(usuario && (comentario.usuario_id === usuario.id_usuario || usuario.rol === 'admin')) && (
-              <button className="btn btn-sm btn-danger" onClick={() => eliminarComentario(comentario.id)}>
-                Eliminar
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+  {comentarios.map((comentario) => (
+    <li
+      key={comentario.id}
+      className="list-group-item mb-3"
+      style={{ borderRadius: '0.5rem', boxShadow: '0 0 4px rgba(0,0,0,0.1)' }}
+    >
+      <div className="d-flex justify-content-between align-items-start">
+        <div>
+          <strong>{comentario.usuario?.nombre || 'Usuario'}:</strong>
+          <p className="mb-1 mt-1">{comentario.contenido}</p>
+          <small className="text-muted">
+            {new Date(comentario.created_at).toLocaleString()}
+          </small>
+        </div>
+        {(usuario && (comentario.usuario_id === usuario.id_usuario || usuario.rol === 'admin')) && (
+          <button
+            className="btn btn-sm btn-danger"
+            onClick={() => eliminarComentario(comentario.id)}
+          >
+            Eliminar
+          </button>
+        )}
+      </div>
+    </li>
+  ))}
+</ul>
+
     </div>
   );
 };

@@ -1,7 +1,7 @@
-// src/components/ReservaForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosCliente from './AxiosCliente'; // ✅ nuevo import
 
 const ReservaForm = () => {
   const navigate = useNavigate();
@@ -15,7 +15,8 @@ const ReservaForm = () => {
 
   useEffect(() => {
     if (fecha) {
-      axios.get(`http://127.0.0.1:8000/api/mesas-disponibles?fecha=${fecha}`)
+      axios
+        .get(`http://127.0.0.1:8000/api/mesas-disponibles?fecha=${fecha}`)
         .then(res => setMesasDisponibles(res.data.mesas_disponibles))
         .catch(() => setMesasDisponibles(null));
     }
@@ -28,7 +29,7 @@ const ReservaForm = () => {
       return;
     }
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/reservas', {
+      const res = await axiosCliente.post('/reservas', {
         id_usuario: usuario.id_usuario,
         fecha_reserva: fecha,
         hora_reserva: hora,
