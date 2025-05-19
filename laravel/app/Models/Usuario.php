@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Usuario extends Model
+class Usuario extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory;
 
     protected $table = 'usuarios';
     protected $primaryKey = 'id_usuario';
@@ -20,6 +21,11 @@ class Usuario extends Model
         'contraseña',
         'telefono',
         'rol'
+    ];
+
+    protected $hidden = [
+        'contraseña',
+        'remember_token'
     ];
 
     public function reservas()

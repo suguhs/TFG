@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
@@ -37,21 +39,15 @@ class AuthController extends Controller
             'rol' => $request->rol ?? 'guest'
         ]);
 
+        // Crear token tras el registro
+        $token = $usuario->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Usuario registrado correctamente',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
             'usuario' => $usuario
         ], 201);
-    }
-
-    public function checkEmail(Request $request)
-    {
-        $request->validate([
-            'gmail' => 'required|email'
-        ]);
-
-        $exists = Usuario::where('gmail', $request->gmail)->exists();
-
-        return response()->json(['exists' => $exists]);
     }
 
     public function login(Request $request)
@@ -69,9 +65,34 @@ class AuthController extends Controller
             ], 401);
         }
 
+        $token = $usuario->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'message' => 'Inicio de sesión exitoso',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
             'usuario' => $usuario
+        ]);
+    }
+
+    public function checkEmail(Request $request)
+    {
+        $request->validate([
+            'gmail' => 'required|email'
+        ]);
+
+        $exists = Usuario::where('gmail', $request->gmail)->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+        $user->tokens()->delete();
+
+        return response()->json([
+            'message' => 'Sesión cerrada correctamente'
         ]);
     }
 }
