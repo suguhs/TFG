@@ -1,8 +1,10 @@
 // src/components/Menu.jsx
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Menu() {
   const user = JSON.parse(localStorage.getItem('usuario'));
+  const navigate = useNavigate();
 
   const [platos, setPlatos] = useState([]);
   const [nuevoPlato, setNuevoPlato] = useState({
@@ -51,9 +53,24 @@ function Menu() {
       });
   };
 
+  // Manejar pedido a domicilio
+  const manejarPedido = () => {
+    if (!user) {
+      alert('Debes iniciar sesión para hacer un pedido.');
+      navigate('/login');
+    } else {
+      navigate('/pedido-domicilio');
+    }
+  };
+
   return (
     <div className="container mt-4 d-flex flex-column align-items-center text-center">
-      <h2 className="mb-4">🍽️ Menú</h2>
+      <div className="d-flex justify-content-between w-100 mb-3">
+        <h2>🍽️ Menú</h2>
+        <button className="btn btn-primary" onClick={manejarPedido}>
+          🛒 Hacer pedido a domicilio
+        </button>
+      </div>
 
       <div className="d-flex flex-wrap justify-content-center gap-4 mb-4">
         {platos.map(plato => (
