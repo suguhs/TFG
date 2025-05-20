@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComentarioController;
 use App\Http\Controllers\Api\ReservaController;
 use App\Http\Controllers\Api\PlatoController;
+use App\Http\Controllers\Api\PedidoController;
 
 // 🔓 Rutas públicas
 Route::post('/register', [AuthController::class, 'register']);
@@ -14,6 +15,7 @@ Route::get('/comentarios', [ComentarioController::class, 'index']);
 Route::get('/platos', [PlatoController::class, 'index']); // Menú
 
 // 🔐 Rutas protegidas por autenticación con Sanctum
+Route::get('/mesas-disponibles', [ReservaController::class, 'mesasDisponibles']);
 Route::middleware('auth:sanctum')->group(function () {
 
     // Comentarios
@@ -24,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reservas', [ReservaController::class, 'store']);
     Route::post('/reservas/{id}/platos', [ReservaController::class, 'añadirPlatos']);
     Route::get('/historial', [ReservaController::class, 'historialUsuario']);
-    Route::get('/mesas-disponibles', [ReservaController::class, 'mesasDisponibles']);
+    
     Route::get('/historial-todas', [ReservaController::class, 'historialTodas']);
     Route::post('/reservas/{id}/estado', [ReservaController::class, 'cambiarEstado']);
 
@@ -38,4 +40,10 @@ Route::middleware('auth:sanctum')->group(function () {
             'usuario' => $request->user()
         ]);
     });
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+    Route::get('/pedidos', [PedidoController::class, 'index']);
+    Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+    Route::post('/pedidos/{id}/estado', [PedidoController::class, 'updateEstado']);
+
+
 });
