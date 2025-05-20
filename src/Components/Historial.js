@@ -3,24 +3,22 @@ import axiosCliente from './AxiosCliente';
 
 const Historial = () => {
   const [reservas, setReservas] = useState([]);
-  const [modo, setModo] = useState('reservas'); // 'reservas' o 'pedidos'
+  const [modo, setModo] = useState('reservas');
   const [mostrarPendientes, setMostrarPendientes] = useState(false);
+  const [loading, setLoading] = useState(true); // 👈 nuevo estado
   const usuario = JSON.parse(localStorage.getItem('usuario'));
 
   const cargarDatos = () => {
-    if (modo === 'reservas') {
-      const url = usuario.rol === 'admin'
-        ? '/historial-todas'
-        : `/historial?id_usuario=${usuario.id_usuario}`;
+    setLoading(true); // 👈 activa el spinner
 
-      axiosCliente.get(url)
-        .then(res => setReservas(res.data))
-        .catch(err => console.error('Error cargando historial:', err));
-    } else {
-      axiosCliente.get('/pedidos')
-        .then(res => setReservas(res.data))
-        .catch(err => console.error('Error cargando pedidos:', err));
-    }
+    const url = modo === 'reservas'
+      ? (usuario.rol === 'admin' ? '/historial-todas' : '/historial')
+      : '/pedidos';
+
+    axiosCliente.get(url)
+      .then(res => setReservas(res.data))
+      .catch(err => console.error('Error cargando historial:', err))
+      .finally(() => setLoading(false)); // 👈 desactiva el spinner
   };
 
   const cambiarEstado = (id, nuevoEstado) => {
@@ -65,7 +63,15 @@ const Historial = () => {
         </div>
       )}
 
-      {datosFiltrados.length === 0 ? (
+    {loading ? (
+     <div className="d-flex flex-column align-items-center mt-5">
+        <div className="spinner-border text-primary mb-3" role="status">
+          <span className="visually-hidden">Cargando historial...</span>
+        </div>
+       <p className="text-muted">Cargando historial...</p>
+      </div>
+    ) : datosFiltrados.length === 0 ? (
+
         <p>No hay {modo === 'reservas' ? 'reservas' : 'pedidos'} registrados.</p>
       ) : (
         datosFiltrados.map((dato) => (

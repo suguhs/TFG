@@ -58,12 +58,14 @@ const Comentarios = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">💬 Comentarios ({comentarios.length})</h2>
+    <div className="container mt-5">
+      <h2 className="mb-4 d-flex align-items-center">
+        <i className="bi bi-chat-dots me-2 fs-4"></i> Comentarios ({comentarios.length})
+      </h2>
 
       {usuario ? (
         <form onSubmit={enviarComentario} className="mb-4">
-          <div className="mb-3">
+          <div className="mb-2">
             <textarea
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
@@ -72,43 +74,45 @@ const Comentarios = () => {
               placeholder="Escribe tu comentario..."
             />
           </div>
-          {error && <p className="text-danger">{error}</p>}
+          {error && <div className="text-danger mb-2">{error}</div>}
           <button type="submit" className="btn btn-primary">Enviar</button>
         </form>
       ) : (
-        <p className="text-muted text-center mb-4">
-          🔒 Debes <a href="/login">iniciar sesión</a> para comentar.
-        </p>
+        <div className="alert alert-secondary text-center">
+          🔒 <a href="/login">Inicia sesión</a> para dejar un comentario.
+        </div>
       )}
 
-      <ul className="list-group">
-  {comentarios.map((comentario) => (
-    <li
-      key={comentario.id}
-      className="list-group-item mb-3"
-      style={{ borderRadius: '0.5rem', boxShadow: '0 0 4px rgba(0,0,0,0.1)' }}
-    >
-      <div className="d-flex justify-content-between align-items-start">
-        <div>
-          <strong>{comentario.usuario?.nombre || 'Usuario'}:</strong>
-          <p className="mb-1 mt-1">{comentario.contenido}</p>
-          <small className="text-muted">
-            {new Date(comentario.created_at).toLocaleString()}
-          </small>
-        </div>
-        {(usuario && (comentario.usuario_id === usuario.id_usuario || usuario.rol === 'admin')) && (
-          <button
-            className="btn btn-sm btn-danger"
-            onClick={() => eliminarComentario(comentario.id)}
-          >
-            Eliminar
-          </button>
-        )}
-      </div>
-    </li>
-  ))}
-</ul>
-
+      {comentarios.length === 0 ? (
+        <p className="text-muted text-center">Aún no hay comentarios.</p>
+      ) : (
+        <ul className="list-unstyled">
+          {comentarios.map((comentario) => (
+            <li
+              key={comentario.id}
+              className="p-3 mb-3 bg-white rounded shadow-sm border"
+            >
+              <div className="d-flex justify-content-between align-items-start">
+                <div>
+                  <strong className="text-dark">{comentario.usuario?.nombre || 'Usuario'}:</strong>
+                  <p className="mb-1 mt-1">{comentario.contenido}</p>
+                  <small className="text-muted">
+                    {new Date(comentario.created_at).toLocaleString()}
+                  </small>
+                </div>
+                {(usuario && (comentario.usuario_id === usuario.id_usuario || usuario.rol === 'admin')) && (
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => eliminarComentario(comentario.id)}
+                  >
+                    Eliminar
+                  </button>
+                )}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
