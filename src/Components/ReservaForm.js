@@ -79,7 +79,7 @@ const ReservaForm = () => {
       });
 
       const id = res.data.reserva.reserva_id;
-      navigate(`/reservas/${id}/platos`);
+      navigate(`/seleccionar-platos`);
     } catch (error) {
       const msg = error.response?.data?.message || '❌ Error al crear la reserva';
       setMensaje(msg);
