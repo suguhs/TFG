@@ -9,15 +9,15 @@ const Footer = () => {
 
           {/* Sección izquierda */}
           <div className="col-md-4 mb-3">
-            <h5>Mi App</h5>
-            <p className="text-muted">
+            <h5 className="text-white">Mi App</h5>
+            <p className="text-white">
               Tu restaurante de confianza. Reserva, pide y disfruta desde casa.
             </p>
           </div>
 
           {/* Enlaces rápidos */}
           <div className="col-md-4 mb-3">
-            <h5>Enlaces útiles</h5>
+            <h5 className="text-white">Enlaces útiles</h5>
             <ul className="list-unstyled">
               <li><Link to="/" className="text-white text-decoration-none">Inicio</Link></li>
               <li><Link to="/menu" className="text-white text-decoration-none">Menú</Link></li>
@@ -28,9 +28,9 @@ const Footer = () => {
 
           {/* Contacto o redes */}
           <div className="col-md-4 mb-3">
-            <h5>Contacto</h5>
-            <p className="mb-1"><i className="bi bi-envelope-fill me-2"></i> contacto@miapp.com</p>
-            <p className="mb-1"><i className="bi bi-phone-fill me-2"></i> +34 600 123 456</p>
+            <h5 className="text-white">Contacto</h5>
+            <p className="text-white mb-1"><i className="bi bi-envelope-fill me-2"></i> contacto@miapp.com</p>
+            <p className="text-white mb-1"><i className="bi bi-phone-fill me-2"></i> +34 600 123 456</p>
             <div className="mt-2">
               <a href="#" className="text-white me-3"><i className="bi bi-facebook"></i></a>
               <a href="#" className="text-white me-3"><i className="bi bi-instagram"></i></a>
@@ -42,8 +42,9 @@ const Footer = () => {
 
         <hr className="border-secondary" />
 
-        <div className="text-center text-muted">
-          &copy; {new Date().getFullYear()} Mi App. Todos los derechos reservados.
+        <div className="text-center text-white">
+          &copy; {new Date().getFullYear()} El Tapeo de Dami
+           Todos los derechos reservados
         </div>
       </div>
     </footer>
