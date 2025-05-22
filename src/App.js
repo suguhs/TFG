@@ -25,7 +25,7 @@ function App() {
             <Route path="/registro" element={<RegisterForm />} />
             <Route path="/comentarios" element={<Comentarios />} />
             <Route path="/reserva" element={<ReservaForm />} />
-            <Route path="/reservas/:id/platos" element={<SeleccionPlatos />} />
+            <Route path="/seleccionar-platos" element={<SeleccionPlatos />} />
             <Route path="/historial" element={<Historial />} />
             <Route path="/pedido-domicilio" element={<PedidoDomicilio />} />
 
