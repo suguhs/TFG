@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosCliente from './AxiosCliente'; // usamos el cliente con el token automático
 
 function LoginForm() {
   const [gmail, setGmail] = useState('');
@@ -7,38 +8,43 @@ function LoginForm() {
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
 
+  // Función que se ejecuta cuando se envía el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje('');
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gmail, contraseña })
+      // Mandamos email y contraseña al backend
+      const res = await axiosCliente.post('/login', {
+        gmail,
+        contraseña
       });
 
-      const data = await res.json();
+      // Guardamos los datos del usuario en localStorage (incluido el token)
+      localStorage.setItem('usuario', JSON.stringify({
+        ...res.data.usuario,
+        token: res.data.access_token
+      }));
 
-      if (res.ok) {
-        setMensaje('✅ Inicio de sesión exitoso');
-        localStorage.setItem('usuario', JSON.stringify({
-          ...data.usuario,
-          token: data.access_token
-        }));
+      setMensaje('✅ Inicio de sesión exitoso');
 
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
-      } else {
-        setMensaje('❌ Correo o contraseña incorrectos');
-      }
+      // Redirigimos a la página de inicio
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+
     } catch (error) {
-      console.error(error);
-      setMensaje('❌ Error al conectar con el servidor');
+      // Si hay error, mostramos un mensaje claro
+      if (error.response?.status === 401) {
+        setMensaje('❌ Correo o contraseña incorrectos');
+      } else {
+        setMensaje('❌ Error al conectar con el servidor');
+        console.error(error);
+      }
     }
   };
 
+  // Llevamos al usuario a la página de registro
   const irARegistro = () => {
     navigate('/registro');
   };
@@ -51,6 +57,7 @@ function LoginForm() {
           <h4 className="mt-2">Iniciar sesión</h4>
         </div>
 
+        {/* Muestra mensajes de error o éxito */}
         {mensaje && (
           <div className={`alert ${mensaje.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
             {mensaje}

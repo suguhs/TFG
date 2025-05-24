@@ -6,6 +6,7 @@ const ReservaForm = () => {
   const navigate = useNavigate();
   const usuario = JSON.parse(localStorage.getItem('usuario'));
 
+  // Estado para guardar los datos del formulario
   const [fecha, setFecha] = useState('');
   const [hora, setHora] = useState('');
   const [horasDisponibles, setHorasDisponibles] = useState([]);
@@ -13,6 +14,7 @@ const ReservaForm = () => {
   const [mensaje, setMensaje] = useState('');
   const [mesasDisponibles, setMesasDisponibles] = useState(null);
 
+  // Saco la fecha de hoy para ponerla como valor mínimo
   const obtenerFechaActual = () => {
     const hoy = new Date();
     const yyyy = hoy.getFullYear();
@@ -21,37 +23,40 @@ const ReservaForm = () => {
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  // Genero una lista con todas las horas en las que se puede reservar
   const generarHorasPermitidas = (fechaSeleccionada) => {
     const ahora = new Date();
-    const margen = new Date(ahora.getTime() + 60 * 60 * 1000);
+    const margen = new Date(ahora.getTime() + 60 * 60 * 1000); // mínimo 1 hora desde ahora
     const hoy = obtenerFechaActual();
     const horas = [];
 
+    // Horario de comidas
     for (let h = 13; h <= 16; h++) {
-      const horaTexto = `${h.toString().padStart(2, '0')}:00`;
-      const horaCompleta = new Date(`${fechaSeleccionada}T${horaTexto}`);
-      if (fechaSeleccionada !== hoy || horaCompleta > margen) {
-        horas.push(horaTexto);
-      }
+      horas.push(`${h.toString().padStart(2, '0')}:00`);
+      if (h !== 16) horas.push(`${h.toString().padStart(2, '0')}:30`);
     }
 
+    // Horario de cenas
     for (let h = 20; h <= 22; h++) {
-      const horaTexto = `${h.toString().padStart(2, '0')}:00`;
-      const horaCompleta = new Date(`${fechaSeleccionada}T${horaTexto}`);
-      if (fechaSeleccionada !== hoy || horaCompleta > margen) {
-        horas.push(horaTexto);
-      }
+      horas.push(`${h.toString().padStart(2, '0')}:00`);
+      if (h !== 22) horas.push(`${h.toString().padStart(2, '0')}:30`);
     }
 
-    return horas;
+    // Si es hoy, quito las horas que ya han pasado o están muy cerca
+    return horas.filter(horaTexto => {
+      const horaCompleta = new Date(`${fechaSeleccionada}T${horaTexto}`);
+      return fechaSeleccionada !== hoy || horaCompleta > margen;
+    });
   };
 
+  // Al cargar la página, pongo la fecha de hoy y calculo las horas disponibles
   useEffect(() => {
     const hoy = obtenerFechaActual();
     setFecha(hoy);
     setHorasDisponibles(generarHorasPermitidas(hoy));
   }, []);
 
+  // Cuando cambia la fecha, vuelvo a calcular horas y pregunto las mesas libres
   useEffect(() => {
     if (fecha) {
       setHorasDisponibles(generarHorasPermitidas(fecha));
@@ -63,8 +68,11 @@ const ReservaForm = () => {
     }
   }, [fecha]);
 
+  // Al enviar el formulario se intenta guardar la reserva
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Si no hay usuario logueado, avisa
     if (!usuario) {
       setMensaje('❌ Debes iniciar sesión para reservar');
       return;
@@ -79,7 +87,12 @@ const ReservaForm = () => {
       });
 
       const id = res.data.reserva.reserva_id;
-      navigate(`/seleccionar-platos`);
+
+      // Después de reservar, llevo al usuario a elegir los platos
+      navigate('/seleccionar-platos', {
+        state: { reservaId: id }
+      });
+
     } catch (error) {
       const msg = error.response?.data?.message || '❌ Error al crear la reserva';
       setMensaje(msg);
@@ -96,6 +109,7 @@ const ReservaForm = () => {
             {mensaje && <div className="alert alert-warning">{mensaje}</div>}
 
             <form onSubmit={handleSubmit}>
+              {/* Fecha de la reserva */}
               <div className="mb-3">
                 <label className="form-label">Fecha:</label>
                 <input
@@ -108,6 +122,7 @@ const ReservaForm = () => {
                 />
               </div>
 
+              {/* Hora de la reserva */}
               <div className="mb-3">
                 <label className="form-label">Hora:</label>
                 <select
@@ -126,6 +141,7 @@ const ReservaForm = () => {
                 </select>
               </div>
 
+              {/* Número de personas */}
               <div className="mb-3">
                 <label className="form-label">Número de personas:</label>
                 <input
@@ -139,6 +155,7 @@ const ReservaForm = () => {
                 />
               </div>
 
+              {/* Cuántas mesas quedan */}
               {mesasDisponibles !== null && (
                 <div className="alert alert-light border">
                   Mesas disponibles para el día seleccionado:{' '}

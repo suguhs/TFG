@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosCliente from './AxiosCliente'; // usamos nuestro cliente con token incluido
 
 function RegisterForm() {
+  // Estado para guardar los datos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
     apellidos: '',
     gmail: '',
     contraseña: '',
     telefono: '',
-    rol: 'guest'
+    rol: 'guest' // por defecto el rol es invitado
   });
 
   const [mensaje, setMensaje] = useState('');
   const navigate = useNavigate();
 
+  // Cada vez que escribo en un campo, actualizo ese valor
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -21,42 +24,40 @@ function RegisterForm() {
     });
   };
 
+  // Cuando se envía el formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMensaje('');
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+      // Enviamos los datos al backend
+      const res = await axiosCliente.post('/register', formData);
+
+      setMensaje('✅ Usuario registrado correctamente.');
+
+      // Vaciamos el formulario
+      setFormData({
+        nombre: '',
+        apellidos: '',
+        gmail: '',
+        contraseña: '',
+        telefono: '',
+        rol: 'guest'
       });
 
-      const data = await res.json();
+      // Redirige al login después de 1 segundo
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
 
-      if (res.ok) {
-        setMensaje('✅ Usuario registrado correctamente.');
-        setFormData({
-          nombre: '',
-          apellidos: '',
-          gmail: '',
-          contraseña: '',
-          telefono: '',
-          rol: 'guest'
-        });
-
-        setTimeout(() => {
-          navigate('/login');
-        }, 1000);
-      } else if (res.status === 422 && data.errors) {
-        const errores = Object.values(data.errors).flat().join('\n');
+    } catch (error) {
+      // Si el error es por validaciones, lo mostramos
+      if (error.response?.status === 422 && error.response.data.errors) {
+        const errores = Object.values(error.response.data.errors).flat().join('\n');
         setMensaje('❌ ' + errores);
       } else {
-        setMensaje('❌ Error inesperado del servidor.');
+        setMensaje('❌ Error al conectar con el servidor.');
       }
-    } catch (error) {
-      console.error(error);
-      setMensaje('❌ Error al conectar con el servidor.');
     }
   };
 
@@ -68,6 +69,7 @@ function RegisterForm() {
           <h4 className="mt-2">Registro de Usuario</h4>
         </div>
 
+        {/* Muestra el mensaje si hay algún error o éxito */}
         {mensaje && (
           <div className={`alert ${mensaje.includes('✅') ? 'alert-success' : 'alert-danger'}`} role="alert">
             {mensaje}

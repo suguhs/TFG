@@ -1,16 +1,27 @@
-// src/components/SeleccionPlatos.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
+import axiosCliente from './AxiosCliente'; // Ajusta la ruta si está en otra carpeta
 
 const SeleccionPlatos = () => {
-  const { id } = useParams(); // id de la reserva
+  const location = useLocation();
+  const navigate = useNavigate();
+  const reservaId = location.state?.reservaId;
+
   const [platos, setPlatos] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
   const [mensaje, setMensaje] = useState('');
 
+  // Validar que haya reservaId
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/platos')
+    if (!reservaId) {
+      alert('❌ No se encontró una reserva válida.');
+      navigate('/'); // O redirige a otra página que tenga sentido
+    }
+  }, [reservaId, navigate]);
+
+  // Cargar platos
+  useEffect(() => {
+    axiosCliente.get('/platos')
       .then(res => setPlatos(res.data))
       .catch(err => console.error('Error cargando platos:', err));
   }, []);
@@ -20,7 +31,11 @@ const SeleccionPlatos = () => {
     if (existe) {
       setSeleccionados(seleccionados.filter(p => p.plato_id !== plato.id_plato));
     } else {
-      setSeleccionados([...seleccionados, { plato_id: plato.id_plato, cantidad: 1, precio: Number(plato.precio) }]);
+      setSeleccionados([...seleccionados, {
+        plato_id: plato.id_plato,
+        cantidad: 1,
+        precio: Number(plato.precio)
+      }]);
     }
   };
 
@@ -34,12 +49,13 @@ const SeleccionPlatos = () => {
 
   const enviarPlatos = async () => {
     try {
-      await axios.post(`http://127.0.0.1:8000/api/reservas/${id}/platos`, {
+      await axiosCliente.post(`/reservas/${reservaId}/platos`, {
         platos: seleccionados
       });
       setMensaje('✅ Platos añadidos correctamente a la reserva');
       setSeleccionados([]);
     } catch (error) {
+      console.error('Error al enviar platos:', error);
       setMensaje('❌ Error al guardar los platos');
     }
   };
@@ -87,7 +103,9 @@ const SeleccionPlatos = () => {
           <div className="mt-3">
             <h5>Total: {calcularTotal().toFixed(2)} €</h5>
           </div>
-          <button className="btn btn-success mt-2" onClick={enviarPlatos}>Enviar platos</button>
+          <button className="btn btn-success mt-2" onClick={enviarPlatos}>
+            Enviar platos
+          </button>
         </>
       )}
     </div>
