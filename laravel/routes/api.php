@@ -12,10 +12,9 @@ use App\Http\Controllers\Api\PedidoController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/comentarios', [ComentarioController::class, 'index']);
-Route::get('/platos', [PlatoController::class, 'index']); // Menú
+Route::get('/platos', [PlatoController::class, 'index']); // Menú público
 
-// 🔐 Rutas protegidas por autenticación con Sanctum
-Route::get('/mesas-disponibles', [ReservaController::class, 'mesasDisponibles']);
+// 🔐 Rutas protegidas por Sanctum
 Route::middleware('auth:sanctum')->group(function () {
 
     // Comentarios
@@ -26,24 +25,26 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reservas', [ReservaController::class, 'store']);
     Route::post('/reservas/{id}/platos', [ReservaController::class, 'añadirPlatos']);
     Route::get('/historial', [ReservaController::class, 'historialUsuario']);
-    
     Route::get('/historial-todas', [ReservaController::class, 'historialTodas']);
     Route::post('/reservas/{id}/estado', [ReservaController::class, 'cambiarEstado']);
+    Route::get('/mesas-disponibles', [ReservaController::class, 'mesasDisponibles']);
 
-    // Platos
+    // Platos (CRUD)
     Route::post('/platos', [PlatoController::class, 'store']);
+    Route::put('/platos/{id}', [PlatoController::class, 'update']);
+    Route::delete('/platos/{id}', [PlatoController::class, 'destroy']);
 
-    // 🔍 Ruta de prueba para verificar autenticación
+    // Pedidos
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+    Route::get('/pedidos', [PedidoController::class, 'index']);
+    Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+    Route::post('/pedidos/{id}/estado', [PedidoController::class, 'updateEstado']);
+
+    // Ruta de prueba
     Route::get('/usuario-autenticado', function (Request $request) {
         return response()->json([
             'message' => 'Usuario autenticado correctamente',
             'usuario' => $request->user()
         ]);
     });
-    Route::post('/pedidos', [PedidoController::class, 'store']);
-    Route::get('/pedidos', [PedidoController::class, 'index']);
-    Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
-    Route::post('/pedidos/{id}/estado', [PedidoController::class, 'updateEstado']);
-
-
 });

@@ -9,7 +9,7 @@ use App\Models\Reserva;
 
 class ReservaController extends Controller
 {
-    const MESAS_TOTALES = 10;
+    const MESAS_TOTALES = 30;
     const PERSONAS_POR_MESA = 4;
 
     public function store(Request $request)
@@ -113,19 +113,24 @@ class ReservaController extends Controller
         return response()->json(['message' => 'Estado actualizado'], 200);
     }
 
-    public function mesasDisponibles(Request $request)
-    {
-        $fecha = $request->query('fecha');
-        if (!$fecha) {
-            return response()->json(['message' => 'Fecha requerida'], 400);
-        }
+public function mesasDisponibles(Request $request)
+{
+    $fecha = $request->query('fecha');
 
-        $mesasOcupadas = Reserva::where('fecha_reserva', $fecha)
-            ->get()
-            ->sum(fn($r) => ceil($r->numero_personas / self::PERSONAS_POR_MESA));
-
-        $disponibles = self::MESAS_TOTALES - $mesasOcupadas;
-
-        return response()->json(['mesas_disponibles' => max(0, $disponibles)]);
+    if (!$fecha) {
+        return response()->json(['message' => 'Fecha requerida'], 400);
     }
+
+    // ✅ Solo contar reservas que ocupan mesas
+    $mesasOcupadas = Reserva::where('fecha_reserva', $fecha)
+        ->whereIn('estado', ['pendiente', 'aceptada']) // 👈 estas bloquean mesas
+        ->get()
+        ->sum(fn($r) => ceil($r->numero_personas / self::PERSONAS_POR_MESA));
+
+    $disponibles = self::MESAS_TOTALES - $mesasOcupadas;
+
+    return response()->json(['mesas_disponibles' => max(0, $disponibles)]);
+}
+
+
 }
