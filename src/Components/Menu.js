@@ -1,6 +1,7 @@
-// src/components/Menu.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axiosCliente from './AxiosCliente';
+
 
 function Menu() {
   const user = JSON.parse(localStorage.getItem('usuario'));
@@ -13,12 +14,12 @@ function Menu() {
     precio: ''
   });
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [editarPlato, setEditarPlato] = useState(null);
 
   // Cargar todos los platos
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/api/platos')
-      .then(res => res.json())
-      .then(data => setPlatos(data))
+    axiosCliente.get('/platos')
+      .then(res => setPlatos(res.data))
       .catch(err => console.error('Error al cargar platos:', err));
   }, []);
 
@@ -30,26 +31,41 @@ function Menu() {
     });
   };
 
-  // Enviar nuevo plato
-  const handleSubmit = (e) => {
+  // Enviar nuevo plato o editar
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    fetch('http://127.0.0.1:8000/api/platos', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ ...nuevoPlato, rol: user?.rol })
-    })
-      .then(async res => {
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Error');
-        setPlatos([...platos, data]);
-        setNuevoPlato({ nombre_plato: '', descripcion: '', precio: '' });
-        setMostrarFormulario(false);
+    const url = editarPlato ? `/platos/${editarPlato.id_plato}` : '/platos';
+    const metodo = editarPlato ? 'put' : 'post';
+
+    try {
+      const res = await axiosCliente[metodo](url, nuevoPlato);
+
+      if (editarPlato) {
+        setPlatos(platos.map(plato =>
+          plato.id_plato === editarPlato.id_plato ? res.data : plato
+        ));
+      } else {
+        setPlatos([...platos, res.data]);
+      }
+
+      setNuevoPlato({ nombre_plato: '', descripcion: '', precio: '' });
+      setMostrarFormulario(false);
+      setEditarPlato(null);
+    } catch (err) {
+      console.error('Error al guardar el plato:', err);
+      alert('❌ No se pudo guardar el plato.');
+    }
+  };
+
+  // Eliminar plato
+  const eliminarPlato = (idPlato) => {
+    axiosCliente.delete(`/platos/${idPlato}`)
+      .then(() => {
+        setPlatos(platos.filter(plato => plato.id_plato !== idPlato));
       })
       .catch(err => {
-        console.error('Error al guardar el plato:', err);
-        alert('❌ No se pudo guardar el plato. Verifica los campos y el rol.');
+        console.error('Error al eliminar plato:', err);
+        alert('❌ No se pudo eliminar el plato.');
       });
   };
 
@@ -65,8 +81,8 @@ function Menu() {
 
   return (
     <div className="container mt-4 d-flex flex-column align-items-center text-center">
-      <div className="d-flex justify-content-between w-100 mb-3">
-        <h2>🍽️ Menú</h2>
+      <h2>🍽️ Menú</h2>
+      <div className="d-flex justify-content-center w-100 mb-3">
         <button className="btn btn-primary" onClick={manejarPedido}>
           🛒 Hacer pedido a domicilio
         </button>
@@ -74,10 +90,28 @@ function Menu() {
 
       <div className="d-flex flex-wrap justify-content-center gap-4 mb-4">
         {platos.map(plato => (
-          <div key={plato.id_plato} className="border rounded p-3" style={{ width: '250px' }}>
+          <div key={plato.id_plato} className="border rounded p-3" style={{ width: '250px', textAlign: 'center' }}>
             <h4>{plato.nombre_plato}</h4>
             <p>{plato.descripcion}</p>
             <p><strong>{plato.precio} €</strong></p>
+            {user?.rol === 'admin' && (
+              <div>
+                <button className="btn btn-warning m-2" onClick={() => {
+                  setEditarPlato(plato);
+                  setNuevoPlato({
+                    nombre_plato: plato.nombre_plato,
+                    descripcion: plato.descripcion,
+                    precio: plato.precio
+                  });
+                  setMostrarFormulario(true);
+                }}>
+                  Editar
+                </button>
+                <button className="btn btn-danger m-2" onClick={() => eliminarPlato(plato.id_plato)}>
+                  Eliminar
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -85,11 +119,15 @@ function Menu() {
       {user?.rol === 'admin' && (
         <div className="text-start w-100" style={{ maxWidth: '400px' }}>
           <button
-            onClick={() => setMostrarFormulario(!mostrarFormulario)}
+            onClick={() => {
+              setEditarPlato(null);
+              setMostrarFormulario(!mostrarFormulario);
+              setNuevoPlato({ nombre_plato: '', descripcion: '', precio: '' });
+            }}
             className="btn btn-link text-decoration-none text-purple mb-3"
           >
             <span style={{ fontSize: '1.5rem', marginRight: '8px' }}>➕</span>
-            Añadir nuevo plato
+            {editarPlato ? 'Editar plato' : 'Añadir nuevo plato'}
           </button>
 
           {mostrarFormulario && (
@@ -121,7 +159,7 @@ function Menu() {
                 onChange={handleChange}
                 required
               />
-              <button type="submit" className="btn btn-success">Guardar</button>
+              <button type="submit" className="btn btn-success">{editarPlato ? 'Actualizar' : 'Guardar'}</button>
             </form>
           )}
         </div>

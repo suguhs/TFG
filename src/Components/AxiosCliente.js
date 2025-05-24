@@ -1,4 +1,4 @@
-// src/api/axiosCliente.js
+
 import axios from 'axios';
 
 const axiosCliente = axios.create({
